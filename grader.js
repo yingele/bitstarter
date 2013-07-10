@@ -33,6 +33,8 @@ var cheerio = require('cheerio');
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
 
+var rest = require('restler'); 
+
 var assertFileExists = function(infile) {
     var instr = infile.toString();
     if(!fs.existsSync(instr)) {
@@ -71,9 +73,26 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-	.option('-u, --URL <online_file>', 'URL of index.html', xxxxxx )
+	.option('-u, --URL <online_file>')	
         .parse(process.argv);
-    var checkJson = checkHtmlFile(program.file, program.checks);
+	var file = program.file
+	if (program.URL != undefined)
+	{
+
+
+		var filename="a.txt";
+  		var url = "http://stark-brook-9411.herokuapp.com";
+		url = program.URL;
+		console.log("Parsing URL:%s", url)
+		rest.get(url, {}).on('complete', function (data) {
+ fs.writeFile('./' + filename, data, function(err, data) {		
+	})})
+	file = filename;
+	} 
+
+	console.log("Parsing file:%s", file)
+    	
+    var checkJson = checkHtmlFile(file, program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);
     console.log(outJson);
 } else {
